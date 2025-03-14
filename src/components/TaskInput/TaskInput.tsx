@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Todo } from '../../@types/todo.type'
 import styles from './taskInput.module.scss'
-
 interface TaskInputProps {
   addTodo: (name: string) => void
   editTodo: (name: string) => void
@@ -12,6 +11,14 @@ interface TaskInputProps {
 export default function TaskInput(props: TaskInputProps) {
   const { addTodo, currentTodo, editTodo, finishEditTodo } = props
   const [name, setName] = useState<string>('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (currentTodo && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.setSelectionRange(currentTodo.name.length, currentTodo.name.length)
+    }
+  }, [currentTodo])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -38,11 +45,13 @@ export default function TaskInput(props: TaskInputProps) {
       <h1 className={styles.title}>To do list typescript</h1>
       <form className={styles.form} onSubmit={handleSubmit}>
         <input
+          ref={inputRef} // Gán ref vào input để focus tự động
           type='text'
           placeholder='caption goes here'
           value={currentTodo ? currentTodo.name : name}
           onChange={onChangeInput}
         />
+
         <button type='submit'>{currentTodo ? '✔️' : '➕'}</button>
       </form>
     </div>
