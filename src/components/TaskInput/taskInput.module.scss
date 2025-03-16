@@ -34,3 +34,21 @@
   margin-top: 0.5rem;
 }
 
+//* 📱 Khi màn hình <= 600px: Form xuống dòng */
+@media (max-width: 600px) {
+  .form {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  input {
+    width: 75%;
+    flex: none;
+  }
+
+  button {
+    width: 20%;
+    flex: none;
+  }
+}
+

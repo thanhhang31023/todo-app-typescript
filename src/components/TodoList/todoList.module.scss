@@ -1,13 +1,28 @@
 .todoList {
-  padding: 3rem;
+  display: flex;
+  justify-content: center;  /* ✅ Căn giữa ngang */
+  align-items: center;      /* ✅ Căn giữa dọc */
+  height: 100vh;           /* ✅ Chiếm toàn bộ chiều cao màn hình */
+  background-color: #f4f4f4; /* Màu nền nhẹ */
 }
+
 
 .todoListContainer {
   background-color: #fff;
   max-width: 40rem;
+  width: 90%; /* ✅ Co dãn tốt trên mọi màn hình */
   padding: 2rem;
-  margin-left: auto;
-  margin-right: auto;
   border-radius: 1rem;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+ 
+
+/* 📱 Khi màn hình nhỏ hơn 600px, điều chỉnh khoảng cách */
+@media (max-width: 600px) {
+ 
+  .todoListContainer {
+    width: 95%; /* ✅ Giúp app không bị dính sát hai bên */
+    padding: 1.5rem;
+  }
 }

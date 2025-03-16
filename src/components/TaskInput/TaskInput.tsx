@@ -21,19 +21,19 @@ export default function TaskInput(props: TaskInputProps) {
   // 🚀 Khi chọn sửa task, tự động điền nội dung task vào input
   useEffect(() => {
     if (currentTodo) {
-      setName(currentTodo.name);
-      checkDuplicate(currentTodo.name); // ✅ Kiểm tra trùng ngay khi sửa
+      setName(currentTodo.name); // ✅ Cập nhật nội dung task cần sửa
       if (inputRef.current) {
         inputRef.current.focus();
         inputRef.current.setSelectionRange(currentTodo.name.length, currentTodo.name.length);
       }
+      checkDuplicate(currentTodo.name); // ✅ Kiểm tra trùng ngay khi sửa
     } else {
-      setName('');
-      resetDuplicateTask(); // ✅ Reset duplicateTask khi thêm mới
+      setName(''); // ✅ Nếu không có task nào đang chỉnh sửa, reset input
+      resetDuplicateTask(); // ✅ Reset trạng thái trùng khi thêm mới
     }
   }, [currentTodo]);
 
-  // 🚀 Hiển thị lỗi ngay khi duplicateTask thay đổi hoặc khi nhập trùng
+  // 🚀 Cập nhật lỗi khi duplicateTask thay đổi hoặc khi người dùng nhập
   useEffect(() => {
     if (duplicateTask && name.trim() === duplicateTask.trim()) {
       setErrorMessage(`⚠️ Task "${duplicateTask}" đã tồn tại!`);
