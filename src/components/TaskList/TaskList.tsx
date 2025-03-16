@@ -1,5 +1,16 @@
 import { Todo } from '../../@types/todo.type'
 import styles from './taskList.module.scss'
+import { 
+  DragDropContext, 
+  Droppable, 
+  Draggable, 
+  DropResult, 
+  DroppableProvided, 
+  DraggableProvided, 
+  DraggableStateSnapshot 
+} from "@hello-pangea/dnd";
+
+
 
 interface TaskListProps {
   doneTaskList?: boolean
@@ -7,11 +18,12 @@ interface TaskListProps {
   handleDoneTodo: (id: string, done: boolean) => void
   startEditTodo: (id: string) => void
   deleteTodo: (id: string) => void
-  duplicateTask?: string | null // Thêm dòng này
+  duplicateTask?: string | null
+  onDragEnd: (result: DropResult) => void
 }
 
 export default function TaskList(props: TaskListProps) {
-  const { doneTaskList, todos, handleDoneTodo, startEditTodo, deleteTodo, duplicateTask } = props
+  const { doneTaskList, todos, handleDoneTodo, startEditTodo, deleteTodo, duplicateTask, onDragEnd } = props
 
   const onChangeCheckbox = (idTodo: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     handleDoneTodo(idTodo, event.target.checked)
@@ -20,32 +32,48 @@ export default function TaskList(props: TaskListProps) {
   return (
     <div className='mb-2'>
       <h2 className={styles.title}>{doneTaskList ? 'Hoàn thành' : 'Chưa hoàn thành'}</h2>
-      <div className={styles.tasks}>
-        {todos.map((todo) => (
-          <div className={styles.task} key={todo.id}>
-            <input
-              type='checkbox'
-              className={styles.taskCheckbox}
-              checked={todo.done}
-              onChange={onChangeCheckbox(todo.id)}
-            />
-            <span
-              className={`${styles.taskName} ${todo.done ? styles.taskNameDone : ''} ${duplicateTask === todo.name ? styles.duplicateTask : ''}`}
-            >
-              {todo.name}
-            </span>
 
-            <div className={styles.taskActions}>
-              <button className={styles.taskBtn} onClick={() => startEditTodo(todo.id)}>
-                🖊️
-              </button>
-              <button className={styles.taskBtn} onClick={() => deleteTodo(todo.id)}>
-                🗑️
-              </button>
-            </div>
+      <Droppable droppableId={doneTaskList ? 'completedTasks' : 'pendingTasks'}>
+        {(provided: DroppableProvided) => (
+          <div className={styles.tasks} {...provided.droppableProps} ref={provided.innerRef}>
+            {todos.map((todo, index) => (
+              <Draggable key={todo.id} draggableId={todo.id} index={index}>
+                {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+                  <div
+                    className={`${styles.task} ${snapshot.isDragging ? styles.dragging : ''}`}
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    <input
+                      type='checkbox'
+                      className={styles.taskCheckbox}
+                      checked={todo.done}
+                      onChange={onChangeCheckbox(todo.id)}
+                    />
+                    <span
+                      className={`${styles.taskName} ${todo.done ? styles.taskNameDone : ''} ${
+                        duplicateTask === todo.name ? styles.duplicateTask : ''
+                      }`}
+                    >
+                      {todo.name}
+                    </span>
+                    <div className={styles.taskActions}>
+                      <button className={styles.taskBtn} onClick={() => startEditTodo(todo.id)}>
+                        🖊️
+                      </button>
+                      <button className={styles.taskBtn} onClick={() => deleteTodo(todo.id)}>
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
           </div>
-        ))}
-      </div>
+        )}
+      </Droppable>
     </div>
   )
 }

@@ -3,10 +3,9 @@ import TaskInput from '../TaskInput';
 import TaskList from '../TaskList';
 import { Todo } from '../../@types/todo.type';
 import styles from './todoList.module.scss';
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 
-type HandleNewTodos = (todos: Todo[]) => Todo[];
-
-const syncReactToLocal = (handleNewTodos: HandleNewTodos) => {
+const syncReactToLocal = (handleNewTodos: (todos: Todo[]) => Todo[]) => {
   const todosString = localStorage.getItem('todos');
   const todosObj: Todo[] = JSON.parse(todosString || '[]');
   const newTodosObj = handleNewTodos(todosObj);
@@ -18,107 +17,85 @@ export default function TodoList() {
   const [currentTodo, setCurrentTodo] = useState<Todo | null>(null);
   const [duplicateTask, setDuplicateTask] = useState<string | null>(null);
 
-  const resetDuplicateTask = () => {
-    setDuplicateTask(null); // ✅ Reset duplicateTask về null
-  };
-
-  // 🚀 Kiểm tra task trùng ngay khi nhập hoặc sửa
-  const checkDuplicate = (name: string) => {
-    const trimmedName = name.trim();
-    if (todos.some((todo) => todo.name === trimmedName)) {
-      setDuplicateTask(trimmedName); // ✅ Đánh dấu task trùng
-    } else {
-      setDuplicateTask(null); // ✅ Không trùng thì reset
-    }
-  };
-
-  const doneTodos = todos.filter((todo) => todo.done);
-  const notdoneTodos = todos.filter((todo) => !todo.done);
-
   useEffect(() => {
     const todosString = localStorage.getItem('todos');
     const todosObj: Todo[] = JSON.parse(todosString || '[]');
     setTodos(todosObj);
   }, []);
 
+  const resetDuplicateTask = () => setDuplicateTask(null);
+
+  const checkDuplicate = (name: string) => {
+    const trimmedName = name.trim();
+    if (todos.some((todo) => todo.name === trimmedName)) {
+      setDuplicateTask(trimmedName);
+    } else {
+      setDuplicateTask(null);
+    }
+  };
+
   const addTodo = (name: string) => {
     const trimmedName = name.trim();
-    checkDuplicate(trimmedName); // ✅ Kiểm tra trùng trước khi thêm
-
-    if (duplicateTask) {
-      return; // ✅ Nếu đã có trùng, không cho thêm
+    if (todos.some((todo) => todo.name === trimmedName)) {
+      setDuplicateTask(trimmedName);
+      return;
     }
 
-    const todo: Todo = {
-      name: trimmedName,
-      done: false,
-      id: new Date().toISOString()
-    };
-    setTodos((prev) => [...prev, todo]);
-    syncReactToLocal((todosObj: Todo[]) => [...todosObj, todo]);
+    resetDuplicateTask();
+    const newTodo: Todo = { name: trimmedName, done: false, id: new Date().toISOString() };
+    setTodos((prev) => [...prev, newTodo]);
+    syncReactToLocal((todosObj) => [...todosObj, newTodo]);
   };
 
   const handleDoneTodo = (id: string, done: boolean) => {
-    const newTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        return { ...todo, done };
-      }
-      return todo;
-    });
-    setTodos(newTodos);
-    localStorage.setItem('todos', JSON.stringify(newTodos));
+    const updatedTodos = todos.map((todo) => (todo.id === id ? { ...todo, done } : todo));
+    setTodos(updatedTodos);
+    localStorage.setItem('todos', JSON.stringify(updatedTodos));
   };
 
   const startEditTodo = (id: string) => {
-    const findedTodo = todos.find((todo) => todo.id === id);
-    if (findedTodo) {
-      setCurrentTodo(findedTodo);
-      checkDuplicate(findedTodo.name); // ✅ Kiểm tra trùng ngay khi bắt đầu sửa
+    const foundTodo = todos.find((todo) => todo.id === id);
+    if (foundTodo) {
+      setCurrentTodo(foundTodo);
+      checkDuplicate(foundTodo.name);
     }
   };
 
   const editTodo = (name: string) => {
-    setCurrentTodo((prev) => {
-      if (prev) return { ...prev, name };
-      return null;
-    });
-    checkDuplicate(name); // ✅ Kiểm tra trùng ngay khi sửa
+    setCurrentTodo((prev) => (prev ? { ...prev, name } : null));
+    checkDuplicate(name);
   };
 
   const finishEditTodo = () => {
     if (!currentTodo) return;
-
     if (todos.some((todo) => todo.id !== currentTodo.id && todo.name.trim() === currentTodo.name.trim())) {
-      setDuplicateTask(currentTodo.name.trim()); // ✅ Nếu trùng, hiển thị lỗi
+      setDuplicateTask(currentTodo.name.trim());
       return;
     }
 
-    resetDuplicateTask(); // ✅ Nếu không trùng, reset lỗi
-
-    const handler = (todoObj: Todo[]) => {
-      return todoObj.map((todo) => (todo.id === currentTodo.id ? currentTodo : todo));
-    };
-    setTodos(handler);
+    resetDuplicateTask();
+    const updatedTodos = todos.map((todo) => (todo.id === currentTodo.id ? currentTodo : todo));
+    setTodos(updatedTodos);
     setCurrentTodo(null);
-    syncReactToLocal(handler);
+    localStorage.setItem('todos', JSON.stringify(updatedTodos));
   };
 
   const deleteTodo = (id: string) => {
-    if (currentTodo) {
-      setCurrentTodo(null);
-    }
-    const handler = (todoObj: Todo[]) => {
-      const findedIndexTodo = todoObj.findIndex((todo) => todo.id === id);
-      if (findedIndexTodo > -1) {
-        const result = [...todoObj];
-        result.splice(findedIndexTodo, 1);
-        return result;
-      }
-      return todoObj;
-    };
-    setTodos(handler);
-    syncReactToLocal(handler);
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    localStorage.setItem('todos', JSON.stringify(todos.filter((todo) => todo.id !== id)));
   };
+
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    const updatedTodos = [...todos];
+    const [reorderedTodo] = updatedTodos.splice(result.source.index, 1);
+    updatedTodos.splice(result.destination.index, 0, reorderedTodo);
+    setTodos(updatedTodos);
+    localStorage.setItem('todos', JSON.stringify(updatedTodos));
+  };
+
+  const doneTodos = todos.filter((todo) => todo.done);
+  const notDoneTodos = todos.filter((todo) => !todo.done);
 
   return (
     <div className={styles.todoList}>
@@ -129,25 +106,29 @@ export default function TodoList() {
           editTodo={editTodo}
           finishEditTodo={finishEditTodo}
           duplicateTask={duplicateTask}
-          resetDuplicateTask={resetDuplicateTask} // ✅ Thêm dòng này để truyền hàm vào
-          checkDuplicate={checkDuplicate} // ✅ Truyền checkDuplicate để kiểm tra trùng
+          resetDuplicateTask={resetDuplicateTask}
+          checkDuplicate={checkDuplicate}
         />
 
-        <TaskList
-          todos={notdoneTodos}
-          handleDoneTodo={handleDoneTodo}
-          startEditTodo={startEditTodo}
-          deleteTodo={deleteTodo}
-          duplicateTask={duplicateTask} // ✅ Thêm dòng này
-        />
-        <TaskList
-          doneTaskList
-          todos={doneTodos}
-          handleDoneTodo={handleDoneTodo}
-          startEditTodo={startEditTodo}
-          deleteTodo={deleteTodo}
-          duplicateTask={duplicateTask} // ✅ Thêm dòng này
-        />
+        <DragDropContext onDragEnd={onDragEnd}>
+          <TaskList
+            todos={notDoneTodos}
+            handleDoneTodo={handleDoneTodo}
+            startEditTodo={startEditTodo}
+            deleteTodo={deleteTodo}
+            duplicateTask={duplicateTask}
+            onDragEnd={onDragEnd}
+          />
+          <TaskList
+            doneTaskList
+            todos={doneTodos}
+            handleDoneTodo={handleDoneTodo}
+            startEditTodo={startEditTodo}
+            deleteTodo={deleteTodo}
+            duplicateTask={duplicateTask}
+            onDragEnd={onDragEnd}
+          />
+        </DragDropContext>
       </div>
     </div>
   );
