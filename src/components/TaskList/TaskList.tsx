@@ -7,10 +7,11 @@ interface TaskListProps {
   handleDoneTodo: (id: string, done: boolean) => void
   startEditTodo: (id: string) => void
   deleteTodo: (id: string) => void
+  duplicateTask?: string | null // Thêm dòng này
 }
 
 export default function TaskList(props: TaskListProps) {
-  const { doneTaskList, todos, handleDoneTodo, startEditTodo, deleteTodo } = props
+  const { doneTaskList, todos, handleDoneTodo, startEditTodo, deleteTodo, duplicateTask } = props
 
   const onChangeCheckbox = (idTodo: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     handleDoneTodo(idTodo, event.target.checked)
@@ -28,7 +29,11 @@ export default function TaskList(props: TaskListProps) {
               checked={todo.done}
               onChange={onChangeCheckbox(todo.id)}
             />
-            <span className={`${styles.taskName} ${todo.done ? styles.taskNameDone : ''}`}>{todo.name}</span>
+            <span
+              className={`${styles.taskName} ${todo.done ? styles.taskNameDone : ''} ${duplicateTask === todo.name ? styles.duplicateTask : ''}`}
+            >
+              {todo.name}
+            </span>
 
             <div className={styles.taskActions}>
               <button className={styles.taskBtn} onClick={() => startEditTodo(todo.id)}>

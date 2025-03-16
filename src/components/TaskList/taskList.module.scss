@@ -3,7 +3,10 @@
 }
 .task {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px; /* ✅ Tạo khoảng cách giữa nội dung và icon mà không làm lệch */
+
   &:not(:last-child) {
     margin-bottom: 1rem;
   }
@@ -15,10 +18,17 @@
   margin-top: 0.5rem;
 }
 .taskName {
-  flex: 0 0 70%;
+  flex: 1; /* ✅ Tự động co giãn giữa checkbox và icon */
+  margin-left: -15px; /* ✅ Giảm khoảng cách với checkbox nhưng vẫn gần icon */
   max-width: 70%;
-  padding: 0 0 0.5rem;
+  //flex: 0 0 70%;
   color: #383f50;
+  margin-left: -30px;
+  max-width: 60%; /* Giới hạn chiều rộng, tránh quá dài */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  display: block;
   &.taskNameDone {
     color: #b2b7bb;
     text-decoration: line-through;
@@ -38,11 +48,10 @@
   font-size: 1.8rem;
 }
 
-.taskName {
-padding-right: 20px;
-  max-width: 60%; /* Giới hạn chiều rộng, tránh quá dài */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  display: block;
+.duplicateTask {
+  background-color: rgba(255, 0, 0, 0.1); /* Màu đỏ nhạt */
+  border: 1px solid rgba(255, 0, 0, 0.5); /* Viền đỏ mềm hơn */
+  border-radius: 8px; /* Bo tròn góc */
+  padding: 8px; /* Khoảng cách bên trong */
+  width: 100%; /* ✅ Đảm bảo task chiếm hết phần còn lại */
 }
