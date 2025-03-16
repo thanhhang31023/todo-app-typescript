@@ -12,6 +12,19 @@ const syncReactToLocal = (handleNewTodos: (todos: Todo[]) => Todo[]) => {
   localStorage.setItem('todos', JSON.stringify(newTodosObj));
 };
 
+function swapItems(arr: Todo[], sourceIndex: number, destinationIndex: number) {
+  // Kiểm tra chỉ số hợp lệ
+  if (sourceIndex < 0 || sourceIndex >= arr.length || destinationIndex < 0 || destinationIndex >= arr.length) {
+    throw new Error('Invalid index')
+  }
+
+  // Hoán đổi bằng destructuring
+  const clonedArr = [...arr]
+  ;[clonedArr[sourceIndex], clonedArr[destinationIndex]] = [clonedArr[destinationIndex], clonedArr[sourceIndex]]
+
+  return clonedArr
+}
+
 export default function TodoList() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [currentTodo, setCurrentTodo] = useState<Todo | null>(null);
@@ -86,13 +99,24 @@ export default function TodoList() {
   };
 
   const onDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-    const updatedTodos = [...todos];
-    const [reorderedTodo] = updatedTodos.splice(result.source.index, 1);
-    updatedTodos.splice(result.destination.index, 0, reorderedTodo);
-    setTodos(updatedTodos);
-    localStorage.setItem('todos', JSON.stringify(updatedTodos));
-  };
+    const pendingTasks = todos.filter((todo) => !todo.done)
+    const completedTasks = todos.filter((todo) => todo.done)
+    if (!result.destination) return
+    // Tìm vị trí cũ của task dựa trên draggableId
+    // Không lấy result.source.index vì nó không đúng khi em đã chia ra 2 list là pendingTasks và completedTasks
+    const sourceIndex = todos.findIndex((todo) => todo.id === result.draggableId)
+    // Tìm vị trí mới của task
+    const usedTasks = result.destination.droppableId === 'completedTasks' ? completedTasks : pendingTasks
+    const destinationId = usedTasks[result.destination.index].id
+    const destinationIndex = todos.findIndex((todo) => todo.id === destinationId)
+
+    // Thay đổi vị trí task
+    const newTodos = swapItems(todos, sourceIndex, destinationIndex)
+    console.log(newTodos)
+    setTodos(newTodos)
+    localStorage.setItem('todos', JSON.stringify(newTodos))
+  }
+
 
   const doneTodos = todos.filter((todo) => todo.done);
   const notDoneTodos = todos.filter((todo) => !todo.done);
