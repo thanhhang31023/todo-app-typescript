@@ -41,9 +41,10 @@ export default function TaskInput(props: TaskInputProps) {
     const trimmedName = name.trim();
   
     // 🚀 Kiểm tra nếu task trống
-    if (trimmedName === '') {
+    if (!trimmedName) {  // 🔥 Dùng !trimmedName thay vì trimmedName === ''
       setErrorMessage('⚠️ Vui lòng nhập nội dung task!');
-      return;
+      setShowError(true);
+      return;  // 🔥 Dừng lại nếu task trống 
     }
   
     // 🚀 Kiểm tra trùng chỉ khi submit (KHÔNG kiểm tra liên tục khi nhập)

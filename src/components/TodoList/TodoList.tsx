@@ -93,26 +93,56 @@ export default function TodoList() {
   const editTodo = (name: string) => {
     setCurrentTodo((prev) => {
       if (!prev) return null;
-      if (prev.name === name.trim()) {
-        resetDuplicateTask(); // ✅ Nếu nội dung không đổi, không hiển thị lỗi
-      } else {
-        checkDuplicate(name); // ✅ Chỉ kiểm tra khi có thay đổi
+  
+      const trimmedName = name.trim();
+  
+      // 🚀 Nếu nội dung không đổi, đặt lỗi và không kiểm tra trùng lặp
+      if (prev.name === trimmedName) {
+        setDuplicateTask(trimmedName); // 🔥 Hiển thị lỗi vì không thay đổi nội dung
+        return prev;
       }
-      return { ...prev, name };
+  
+      // 🚀 Nếu nội dung thay đổi, kiểm tra trùng lặp
+      if (checkDuplicate(trimmedName, prev.id)) {
+        setDuplicateTask(trimmedName);
+      } else {
+        resetDuplicateTask(); // ✅ Nếu hợp lệ, reset trạng thái lỗi
+      }
+  
+      return { ...prev, name: trimmedName };
     });
   };
+  
   
 
   const finishEditTodo = () => {
     if (!currentTodo) return;
   
-    if (checkDuplicate(currentTodo.name, currentTodo.id)) {
-      setDuplicateTask(currentTodo.name.trim());
+    const trimmedName = currentTodo.name.trim();
+    const originalTask = todos.find((todo) => todo.id === currentTodo.id);
+  
+    // 🚀 Nếu không tìm thấy task gốc, thoát luôn
+    if (!originalTask) return;
+  
+    // 🚀 Kiểm tra nếu nội dung không thay đổi
+    if (trimmedName === originalTask.name.trim()) {
+      setDuplicateTask(trimmedName);
+      return;
+    }
+  
+    // 🚀 Kiểm tra trùng lặp trước khi cập nhật
+    if (checkDuplicate(trimmedName, currentTodo.id)) {
+      setDuplicateTask(trimmedName);
       return;
     }
   
     resetDuplicateTask();
-    const updatedTodos = todos.map((todo) => (todo.id === currentTodo.id ? currentTodo : todo));
+  
+    // 🚀 Cập nhật task
+    const updatedTodos = todos.map((todo) =>
+      todo.id === currentTodo.id ? { ...todo, name: trimmedName } : todo
+    );
+  
     setTodos(updatedTodos);
     setCurrentTodo(null);
     localStorage.setItem('todos', JSON.stringify(updatedTodos));
