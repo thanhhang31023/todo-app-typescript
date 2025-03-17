@@ -7,7 +7,7 @@
   justify-content: space-between;
   gap: 12px; /* ✅ Tạo khoảng cách giữa nội dung và icon mà không làm lệch */
   padding: 4px;
-  
+
   border-radius: 8px;
   border: 1px solid #ea9652;
 
@@ -25,7 +25,6 @@
   max-width: 10%;
   height: 2rem;
   margin-top: 0.5rem;
-  
 
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -38,7 +37,7 @@
 .taskName {
   flex: 1; /* ✅ Tự động co giãn giữa checkbox và icon */
   margin-left: -15px; /* ✅ Giảm khoảng cách với checkbox nhưng vẫn gần icon */
-  
+
   //flex: 0 0 70%;
   color: #383f50;
   margin-left: -30px;
@@ -51,21 +50,14 @@
   &.taskNameDone {
     color: #b2b7bb;
     text-decoration: line-through;
-    
-    
   }
 }
 
 .taskActions {
-  flex: 0 0 35%;
-  max-width: 22%;
-  gap: 1px;
-  margin-right: -5px;
-  
+  flex: 0 0 20%;
+  max-width: 20%;
   display: flex;
-   flex-shrink: 0;
-  
-  
+  justify-content: space-between;
 }
 
 .taskBtn {
@@ -74,9 +66,7 @@
   font-size: 1.8rem;
 
   padding: 5px;
-  margin-left: 0px;
- 
-  
+  margin-left: 1px;
 
   border-radius: 6px;
   cursor: pointer;
@@ -89,13 +79,18 @@
   }
 }
 
+@media (max-width: 400px) {
+  .taskActions {
+    flex: 0 0 30%;
+    max-width: 21%;
+  }
+}
 .dragging {
   background: rgba(0, 0, 0, 0.05);
 }
 
 .duplicateTask {
-  
-  font-weight: bolder ;
+  font-weight: bolder;
   color: #ba1929;
   background-color: rgba(255, 0, 0, 0.15); /* Màu đỏ nhạt */
   border: 1px solid rgba(255, 0, 0, 0.5); /* Viền đỏ mềm hơn */
@@ -103,7 +98,6 @@
   padding: 10px; /* Khoảng cách bên trong */
   width: 100%; /* ✅ Đảm bảo task chiếm hết phần còn lại */
 }
-
 
 .completedTaskList .task {
   background-color: #5a5a5a; /* Nền xám cho task */
@@ -118,4 +112,3 @@
   text-decoration: line-through;
   color: #fff;
 }
-
