@@ -51,15 +51,10 @@ export default function TodoList() {
     // Kiểm tra task đã tồn tại chưa
     const existingTask = todos.find((todo) => todo.name === trimmedName);
     if (existingTask) {
-      console.log("🔴 Task bị trùng:", trimmedName); // Log kiểm tra
+      console.log("🔴 Task already exists!:", trimmedName); // Log kiểm tra
       setDuplicateTask(trimmedName);
       
-      // Đảm bảo state thay đổi
-      // setTimeout(() => {
-      //   console.log("✅ Bỏ highlight task trùng");
-      //   setDuplicateTask(null);
-      // }, 2000); 
-  
+    
       return;
     }
   
@@ -98,7 +93,7 @@ export default function TodoList() {
   
       // 🚀 Nếu nội dung không đổi, đặt lỗi và không kiểm tra trùng lặp
       if (prev.name === trimmedName) {
-        setDuplicateTask(trimmedName); // 🔥 Hiển thị lỗi vì không thay đổi nội dung
+        //setDuplicateTask(trimmedName); // 🔥 Hiển thị lỗi vì không thay đổi nội dung
         return prev;
       }
   
@@ -126,7 +121,7 @@ export default function TodoList() {
   
     // 🚀 Kiểm tra nếu nội dung không thay đổi
     if (trimmedName === originalTask.name.trim()) {
-      setDuplicateTask(trimmedName);
+      setCurrentTodo(null);
       return;
     }
   
@@ -152,7 +147,7 @@ export default function TodoList() {
   
 
   const deleteTodo = (id: string) => {
-    const isConfirmed = window.confirm("Bạn có chắc chắn muốn xóa task này?");
+    const isConfirmed = window.confirm("Are you sure you want to delete this task?");
     if (!isConfirmed) return;
     
     setTodos((prev) => prev.filter((todo) => todo.id !== id));

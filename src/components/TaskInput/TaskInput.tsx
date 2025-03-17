@@ -42,7 +42,7 @@ export default function TaskInput(props: TaskInputProps) {
   
     // 🚀 Kiểm tra nếu task trống
     if (!trimmedName) {  // 🔥 Dùng !trimmedName thay vì trimmedName === ''
-      setErrorMessage('⚠️ Vui lòng nhập nội dung task!');
+      setErrorMessage('⚠️ Please enter the task content!');
       setShowError(true);
       return;  // 🔥 Dừng lại nếu task trống 
     }
@@ -50,7 +50,7 @@ export default function TaskInput(props: TaskInputProps) {
     // 🚀 Kiểm tra trùng chỉ khi submit (KHÔNG kiểm tra liên tục khi nhập)
     if (checkDuplicate(trimmedName)) {
 
-      setErrorMessage(`⚠️ Task "${trimmedName}" đã tồn tại!`);
+      setErrorMessage(`⚠️ Task "${trimmedName}" already exists!`);
       addTodo(trimmedName);
       finishEditTodo();
 

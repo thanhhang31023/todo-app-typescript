@@ -1,15 +1,18 @@
 .title {
   margin-bottom: 2rem;
+ 
 }
 .task {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px; /* ✅ Tạo khoảng cách giữa nội dung và icon mà không làm lệch */
+ // gap: 12px; /* ✅ Tạo khoảng cách giữa nội dung và icon mà không làm lệch */
   padding: 4px;
 
   border-radius: 8px;
-  border: 1px solid #ea9652;
+  border: 1px solid #97cda1;
+  font-weight: 450;
+ 
 
   &:not(:last-child) {
     margin-bottom: 1rem;
@@ -25,6 +28,8 @@
   max-width: 10%;
   height: 2rem;
   margin-top: 0.5rem;
+  
+  
 
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -35,22 +40,17 @@
 }
 
 .taskName {
-  flex: 1; /* ✅ Tự động co giãn giữa checkbox và icon */
-  margin-left: -15px; /* ✅ Giảm khoảng cách với checkbox nhưng vẫn gần icon */
-
+  flex:1; /* ✅ Tự động co giãn giữa checkbox và icon */
+   /* ✅ Giảm khoảng cách với checkbox nhưng vẫn gần icon */
   //flex: 0 0 70%;
-  color: #383f50;
-  margin-left: -30px;
+  color:#fffcfc;
+margin-right: 30px;
   max-width: 60%; /* Giới hạn chiều rộng, tránh quá dài */
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: normal;
   display: block;
 
-  &.taskNameDone {
-    color: #b2b7bb;
-    text-decoration: line-through;
-  }
 }
 
 .taskActions {
@@ -58,9 +58,11 @@
   max-width: 20%;
   display: flex;
   justify-content: space-between;
+  
 }
 
 .taskBtn {
+ background-color:  #f5f8de;
   flex: 0 0 3.5rem;
   max-width: 3.5rem;
   font-size: 1.8rem;
@@ -80,35 +82,66 @@
 }
 
 @media (max-width: 400px) {
+ 
   .taskActions {
     flex: 0 0 30%;
     max-width: 21%;
   }
 }
+
+@media (min-width: 1024px) {
+  .taskName{
+    max-width: 70%;
+  }
+  .taskActions {
+    flex: 0 0 10%;
+    max-width: 10%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .taskBtn {
+    flex: 0 0 3.5rem;
+    max-width: 3.5rem;
+    font-size: 1.8rem;
+  }  
+  
+  .taskName {
+    margin-left: 0px;
+     /* ✅ Tự động co giãn giữa checkbox và icon */
+    
+  }
+}
+
+
 .dragging {
   background: rgba(0, 0, 0, 0.05);
 }
 
-.duplicateTask {
-  font-weight: bolder;
-  color: #ba1929;
-  background-color: rgba(255, 0, 0, 0.15); /* Màu đỏ nhạt */
-  border: 1px solid rgba(255, 0, 0, 0.5); /* Viền đỏ mềm hơn */
-  border-radius: 8px; /* Bo tròn góc */
-  padding: 10px; /* Khoảng cách bên trong */
-  width: 100%; /* ✅ Đảm bảo task chiếm hết phần còn lại */
-}
 
 .completedTaskList .task {
-  background-color: #5a5a5a; /* Nền xám cho task */
+ 
   border: 1px solid #777;
   color: white;
   opacity: 0.6;
-  background: rgba(237, 200, 229, 0.2);
-  border-color: #0a0004;
+  background: rgba(166, 200, 176, 0.2);
+  border-color: #69756b;
 }
 
 .completedTaskList .taskName {
   text-decoration: line-through;
   color: #fff;
 }
+
+.duplicateTask {
+  font-weight: bolder;
+  
+  background-color: rgba(245, 247, 142, 0.15); /* Màu đỏ nhạt */
+  border: 2px solid rgba(250, 246, 1, 0.5); /* Viền đỏ mềm hơn */
+  border-radius: 8px; /* Bo tròn góc */
+  padding: 10px; /* Khoảng cách bên trong */
+  width: 100%; /* ✅ Đảm bảo task chiếm hết phần còn lại */
+}
+
+
+

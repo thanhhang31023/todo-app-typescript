@@ -31,7 +31,7 @@ export default function TaskList(props: TaskListProps) {
 
   return (
     <div className='mb-2'>
-      <h2 className={styles.title}>{doneTaskList ? '🎉Completed Tasks' : '📌To do Tasks'}</h2>
+      <h2 className={styles.title}>{doneTaskList ? '🎉Completed Tasks' : '📌Todo Tasks'}</h2>
 
       <Droppable droppableId={doneTaskList ? 'completedTasks' : 'pendingTasks'}>
         {(provided: DroppableProvided) => (
