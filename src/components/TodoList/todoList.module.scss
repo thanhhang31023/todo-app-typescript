@@ -3,17 +3,19 @@
   justify-content: center;  /* ✅ Căn giữa ngang */
   align-items: center;      /* ✅ Căn giữa dọc */
   height: 100vh;           /* ✅ Chiếm toàn bộ chiều cao màn hình */
-  background-color: #f4f4f4; /* Màu nền nhẹ */
+  background-color: #6e966e;
+  ; /* Màu nền nhẹ */
 }
 
 
 .todoListContainer {
-  background-color: #fff;
+  background-color: #5a8e5a;
+  color: #ffff;
   max-width: 40rem;
   width: 90%; /* ✅ Co dãn tốt trên mọi màn hình */
   padding: 2rem;
   border-radius: 1rem;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 6px rgba(231, 126, 5, 0.1);
 }
 
  

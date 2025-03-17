@@ -31,11 +31,16 @@ export default function TaskList(props: TaskListProps) {
 
   return (
     <div className='mb-2'>
-      <h2 className={styles.title}>{doneTaskList ? 'Hoàn thành' : 'Chưa hoàn thành'}</h2>
+      <h2 className={styles.title}>{doneTaskList ? '🎉Completed Tasks' : '📌To do Tasks'}</h2>
 
       <Droppable droppableId={doneTaskList ? 'completedTasks' : 'pendingTasks'}>
         {(provided: DroppableProvided) => (
-          <div className={styles.tasks} {...provided.droppableProps} ref={provided.innerRef}>
+        <div
+        className={`${styles.tasks} ${doneTaskList ? styles.completedTaskList : ''}`}
+        {...provided.droppableProps}
+        ref={provided.innerRef}
+      >
+      
             {todos.map((todo, index) => (
               <Draggable key={todo.id} draggableId={todo.id} index={index}>
                 {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (

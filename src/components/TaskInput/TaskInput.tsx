@@ -91,12 +91,13 @@ export default function TaskInput(props: TaskInputProps) {
 
   return (
     <div className='mb-2'>
-      <h1 className={styles.title}>To do list typescript</h1>
+      <h1 className={styles.title}>Create your Todo-List
+      </h1>
       <form className={styles.form} onSubmit={handleSubmit}>
         <input
           ref={inputRef}
           type='text'
-          placeholder='caption goes here'
+          placeholder='What are your tasks for today？'
           value={name}
           onChange={onChangeInput}
           className={showError ? styles.duplicateTask : ''}
