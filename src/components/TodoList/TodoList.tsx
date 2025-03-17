@@ -38,27 +38,42 @@ export default function TodoList() {
 
   const resetDuplicateTask = () => setDuplicateTask(null);
 
-  const checkDuplicate = (name: string) => {
+  const checkDuplicate = (name: string, excludeId?: string): boolean => {
     const trimmedName = name.trim();
-    if (todos.some((todo) => todo.name === trimmedName)) {
-      setDuplicateTask(trimmedName);
-    } else {
-      setDuplicateTask(null);
-    }
+    return todos.some((todo) => todo.id !== excludeId && todo.name === trimmedName);
   };
+  
+    
 
   const addTodo = (name: string) => {
     const trimmedName = name.trim();
-    if (todos.some((todo) => todo.name === trimmedName)) {
+  
+    // Kiểm tra task đã tồn tại chưa
+    const existingTask = todos.find((todo) => todo.name === trimmedName);
+    if (existingTask) {
+      console.log("🔴 Task bị trùng:", trimmedName); // Log kiểm tra
       setDuplicateTask(trimmedName);
+      
+      // Đảm bảo state thay đổi
+      // setTimeout(() => {
+      //   console.log("✅ Bỏ highlight task trùng");
+      //   setDuplicateTask(null);
+      // }, 2000); 
+  
       return;
     }
-
+  
     resetDuplicateTask();
     const newTodo: Todo = { name: trimmedName, done: false, id: new Date().toISOString() };
     setTodos((prev) => [...prev, newTodo]);
     syncReactToLocal((todosObj) => [...todosObj, newTodo]);
   };
+  
+  
+  
+  
+  
+  
 
   const handleDoneTodo = (id: string, done: boolean) => {
     const updatedTodos = todos.map((todo) => (todo.id === id ? { ...todo, done } : todo));
@@ -70,33 +85,51 @@ export default function TodoList() {
     const foundTodo = todos.find((todo) => todo.id === id);
     if (foundTodo) {
       setCurrentTodo(foundTodo);
-      checkDuplicate(foundTodo.name);
+      resetDuplicateTask(); // 🔥 Không kiểm tra trùng lặp ngay lập tức
     }
   };
+  
 
   const editTodo = (name: string) => {
-    setCurrentTodo((prev) => (prev ? { ...prev, name } : null));
-    checkDuplicate(name);
+    setCurrentTodo((prev) => {
+      if (!prev) return null;
+      if (prev.name === name.trim()) {
+        resetDuplicateTask(); // ✅ Nếu nội dung không đổi, không hiển thị lỗi
+      } else {
+        checkDuplicate(name); // ✅ Chỉ kiểm tra khi có thay đổi
+      }
+      return { ...prev, name };
+    });
   };
+  
 
   const finishEditTodo = () => {
     if (!currentTodo) return;
-    if (todos.some((todo) => todo.id !== currentTodo.id && todo.name.trim() === currentTodo.name.trim())) {
+  
+    if (checkDuplicate(currentTodo.name, currentTodo.id)) {
       setDuplicateTask(currentTodo.name.trim());
       return;
     }
-
+  
     resetDuplicateTask();
     const updatedTodos = todos.map((todo) => (todo.id === currentTodo.id ? currentTodo : todo));
     setTodos(updatedTodos);
     setCurrentTodo(null);
     localStorage.setItem('todos', JSON.stringify(updatedTodos));
   };
+  
+  
+  
 
   const deleteTodo = (id: string) => {
+    const isConfirmed = window.confirm("Bạn có chắc chắn muốn xóa task này?");
+    if (!isConfirmed) return;
+    
     setTodos((prev) => prev.filter((todo) => todo.id !== id));
     localStorage.setItem('todos', JSON.stringify(todos.filter((todo) => todo.id !== id)));
   };
+
+  
 
   const onDragEnd = (result: DropResult) => {
     const pendingTasks = todos.filter((todo) => !todo.done)

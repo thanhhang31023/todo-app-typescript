@@ -9,77 +9,80 @@ interface TaskInputProps {
   currentTodo: Todo | null;
   duplicateTask: string | null;
   resetDuplicateTask: () => void;
-  checkDuplicate: (name: string) => void; // ✅ Thêm hàm kiểm tra trùng từ TodoList.tsx
+  checkDuplicate: (name: string) => boolean;
 }
 
 export default function TaskInput(props: TaskInputProps) {
   const { addTodo, currentTodo, editTodo, finishEditTodo, duplicateTask, resetDuplicateTask, checkDuplicate } = props;
   const [name, setName] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string>(''); 
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [showError, setShowError] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 🚀 Khi chọn sửa task, tự động điền nội dung task vào input
   useEffect(() => {
     if (currentTodo) {
-      setName(currentTodo.name); // ✅ Cập nhật nội dung task cần sửa
+      setName(currentTodo.name);
       if (inputRef.current) {
         inputRef.current.focus();
         inputRef.current.setSelectionRange(currentTodo.name.length, currentTodo.name.length);
       }
-      checkDuplicate(currentTodo.name); // ✅ Kiểm tra trùng ngay khi sửa
+      resetDuplicateTask();
+      setShowError(false);
     } else {
-      setName(''); // ✅ Nếu không có task nào đang chỉnh sửa, reset input
-      resetDuplicateTask(); // ✅ Reset trạng thái trùng khi thêm mới
-    }
-  }, [currentTodo]);
-
-  // 🚀 Cập nhật lỗi khi duplicateTask thay đổi hoặc khi người dùng nhập
-  useEffect(() => {
-    if (duplicateTask && name.trim() === duplicateTask.trim()) {
-      setErrorMessage(`⚠️ Task "${duplicateTask}" đã tồn tại!`);
-    } else {
+      setName('');
+      resetDuplicateTask();
+      setShowError(false);
       setErrorMessage('');
     }
-  }, [duplicateTask, name]);
+  }, [currentTodo]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmedName = name.trim();
-
+  
     // 🚀 Kiểm tra nếu task trống
     if (trimmedName === '') {
       setErrorMessage('⚠️ Vui lòng nhập nội dung task!');
       return;
     }
+  
+    // 🚀 Kiểm tra trùng chỉ khi submit (KHÔNG kiểm tra liên tục khi nhập)
+    if (checkDuplicate(trimmedName)) {
 
-    // 🚀 Kiểm tra nếu task trùng tên
-    checkDuplicate(trimmedName); // ✅ Kiểm tra trùng trước khi submit
-    if (duplicateTask && trimmedName === duplicateTask.trim()) {
-      setErrorMessage(`⚠️ Task "${duplicateTask}" đã tồn tại!`);
+      setErrorMessage(`⚠️ Task "${trimmedName}" đã tồn tại!`);
+      addTodo(trimmedName);
+      finishEditTodo();
+
+      setShowError(true);
+
       return;
-    }
 
+    }
+  
     // ✅ Nếu hợp lệ, tiếp tục xử lý
     setErrorMessage('');
     if (currentTodo) {
-      finishEditTodo(); // ✅ Hoàn tất chỉnh sửa
+      finishEditTodo(); // ✅ Kiểm tra trùng khi nhấn "Hoàn tất"
     } else {
-      addTodo(trimmedName);
+      addTodo(trimmedName); // ✅ Kiểm tra trùng khi nhấn "Thêm task"
     }
     setName('');
   };
+  
 
   const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
     setName(newValue);
 
-    checkDuplicate(newValue); // ✅ Kiểm tra trùng ngay khi nhập
-
-    if (currentTodo) {
-      editTodo(newValue); // ✅ Gọi editTodo để cập nhật khi sửa
+    if (showError) {
+      setShowError(false);
+      setErrorMessage('');
     }
 
-    // 🚀 Khi người dùng nhập một giá trị mới, reset duplicateTask nếu khác
+    if (currentTodo) {
+      editTodo(newValue);
+    }
+
     if (duplicateTask && newValue.trim() !== duplicateTask.trim()) {
       resetDuplicateTask();
     }
@@ -95,11 +98,11 @@ export default function TaskInput(props: TaskInputProps) {
           placeholder='caption goes here'
           value={name}
           onChange={onChangeInput}
-          className={duplicateTask && name.trim() === duplicateTask.trim() ? styles.duplicateTask : ''}
+          className={showError ? styles.duplicateTask : ''}
         />
         <button type='submit'>{currentTodo ? '✔️' : '➕'}</button>
       </form>
-      {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+      {showError && <p className={styles.error}>{errorMessage}</p>}
     </div>
   );
 }
